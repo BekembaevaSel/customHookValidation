@@ -1,83 +1,53 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
+import useInput from '../hooks/useInput'
 
 const Form = () => {
-	const [email, setEmail] = useState('')
-	const [password, setPassword] = useState('')
-	const [emailDirty, setEmailDirty] = useState(false)
-	const [passwordDirty, setPasswordDirty] = useState(false)
-	const [emailError, setEmailError] = useState('Email can not be empty')
-	const [passwordError, setPasswordError] = useState(
-		'Password can not be empty',
-	)
-	const [formValid, setFormValid] = useState(false)
+	const email = useInput('', { isEmpty: true, minLength: 3 })
 
-	useEffect(() => {
-		if (emailError || passwordError) {
-			setFormValid(false)
-		} else {
-			setFormValid(true)
-		}
-	}, [emailError, passwordError])
-
-	const emailHandler = (e) => {
-		setEmail(e.target.value)
-		const re =
-			/^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
-		if (!re.test(String(e.target.value).toLowerCase())) {
-			setEmailError('Некорректный емейл адрес')
-		} else {
-			setEmailError('')
-		}
-	}
-	const passwordHandler = (e) => {
-		setPassword(e.target.value)
-		if (e.target.value.length < 3 || e.target.value.length > 8) {
-			setPasswordError('пароль должен быть длиннее 3 и меньше 8')
-			if (!e.target.value) {
-				setPasswordError('Password can not be empty')
-			}
-		} else {
-			setPasswordError('')
-		}
-	}
-
-	const blurHandler = (e) => {
-		switch (e.target.name) {
-			case 'email':
-				setEmailDirty(true)
-				break
-			case 'password':
-				setPasswordDirty(true)
-				break
-		}
-	}
+	const password = useInput('', { isEmpty: true, minLength: 3 })
 	return (
 		<div>
 			<form>
 				<h1>Регистрация</h1>
-				{emailDirty && emailError && (
-					<div style={{ color: 'red' }}>{emailError}</div>
+				{email.isDirty && email.isEmpty && (
+					<div style={{ color: 'red' }}>
+						the field can not be empty
+					</div>
+				)}
+				{email.isDirty && email.minlength && (
+					<div style={{ color: 'red' }}>length is not allowed</div>
+				)}
+				{email.isDirty && email.emailError && (
+					<div style={{ color: 'red' }}>incorrect email</div>
 				)}
 				<input
-					value={email}
-					onBlur={(e) => blurHandler(e)}
+					value={email.value}
+					onChange={email.onChange}
+					onBlur={email.onBlur}
 					name='email'
 					type='text'
 					placeholder='enter your email'
-					onChange={emailHandler}
 				/>
-				{passwordDirty && passwordError && (
-					<div style={{ color: 'red' }}>{passwordError}</div>
+				{password.isDirty && password.isEmpty && (
+					<div style={{ color: 'red' }}>
+						the field can not be empty
+					</div>
+				)}
+				{password.isDirty && password.minlength && (
+					<div style={{ color: 'red' }}>length is not allowed</div>
 				)}
 				<input
-					value={password}
-					onBlur={(e) => blurHandler(e)}
+					value={password.value}
+					onChange={password.onChange}
+					onBlur={password.onBlur}
 					name='password'
 					type='password'
 					placeholder='enter your password'
-					onChange={passwordHandler}
 				/>
-				<button disabled={!formValid} type='submit'>
+				<button
+					disabled={!email.inputValid || !password.inputValid}
+					type='submit'
+				>
 					Registration
 				</button>
 			</form>
